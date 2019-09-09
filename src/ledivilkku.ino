@@ -35,6 +35,8 @@ template <uint16_t Bits, uint16_t BYTE_LENGTH = (Bits - 1) / 8 + 1>
 class BitArray {
   using bit_array_t = uint8_t;
   using index_t = uint8_t;
+  using this_type = BitArray<Bits, BYTE_LENGTH>;
+
   static_assert(sizeof(bit_array_t) == 1, "bit_array_t must be sized 1 byte.");
   static_assert(BYTE_LENGTH == (Bits - 1) / 8 + 1,
                 "Do not modify the value of BYTE_LENGTH.");
@@ -73,19 +75,15 @@ public:
   }
 
   // @brief Returns the amount of bytes used by the array.
-  auto byte_size() const {
-    return BYTE_LENGTH;
-  }
+  auto byte_size() const { return BYTE_LENGTH; }
 
   // @brief Returns the amount of bits in use.
-  // @note If bit_size() % 8 != 0, remaining bits can still 
-  // be directly accessable and modifiable, but doing so is 
+  // @note If bit_size() % 8 != 0, remaining bits can still
+  // be directly accessable and modifiable, but doing so is
   // undefined under class specifications: please use least_signf_byte()
-  // to access the last byte and least_signf_byte_mask() with &-operator 
+  // to access the last byte and least_signf_byte_mask() with &-operator
   // to modify.
-  auto bit_size() const {
-    return Bits;
-  }
+  auto bit_size() const { return Bits; }
 
   // @brief Returns the mask used for modifying the least significant byte.
   bit_array_t least_signf_byte_mask() const {
@@ -119,8 +117,31 @@ private:
     bit_array[0] >>= sr;
   }
 
+  void and_with(const this_type &other) {
+    uint16_t len = shorter(other);
+    for (index_t i = 0; i < len; ++i)
+      bit_array[i] &= other.bit_array[i];
+  }
+
+  void or_with(const this_type &other) {
+    uint16_t len = shorter(other);
+    for (index_t i = 0; i < len; ++i)
+      bit_array[i] |= other.bit_array[i];
+  }
+
+  void xor_with(const this_type &other) {
+    uint16_t len = shorter(other);
+    for (index_t i = 0; i < len; ++i)
+      bit_array[i] ^= other.bit_array[i];
+  }
+
+  inline uint16_t shorter(const this_type &other) {
+    return (BYTE_LENGTH < other.BYTE_LENGTH ? BYTE_LENGTH
+                                              : rhs.BYTE_LENGTH);
+  }
+
 public:
-  static const uint16_t BITS_IN_BYTE = 8;
+  static const uint8_t BITS_IN_BYTE = 8;
 
   // Storage array.
   bit_array_t bit_array[BYTE_LENGTH];
