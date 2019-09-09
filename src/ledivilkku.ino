@@ -137,7 +137,7 @@ private:
 
   inline uint16_t shorter(const this_type &other) {
     return (BYTE_LENGTH < other.BYTE_LENGTH ? BYTE_LENGTH
-                                              : rhs.BYTE_LENGTH);
+                                              : other.BYTE_LENGTH);
   }
 
 public:
