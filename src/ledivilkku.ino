@@ -25,12 +25,11 @@ led_bit_t ledArray[LED_BITS_TO_BYTES];
 
 /**
  * BitArray object stores bits in the most space-efficient manner
- * and does bitwise operations to them using little-endian byte order.
+ * and does bitwise operations to them using big-endian byte order.
  * NOTE:
  * With direct access to bit_array, do not modify bits outside your
  * defined Bits count as it might cause undefined behaviour, especially
  * with shift operators.
- * @param {string} Bits Who wrote the book
  */
 template <uint16_t Bits, uint16_t BYTE_LENGTH = (Bits - 1) / 8 + 1>
 class BitArray {
@@ -45,49 +44,85 @@ public:
   BitArray() {}
   ~BitArray() {}
 
+  // @brief Shifts bits left specified amount.
+  // @param shift The amount to shift.
+  // @note Only positive shifts are executed.
   void shift_left(index_t shift) {
     if (shift > 0) {
-      for (index_t i = 0; i < shift / BITS_PER_BYTE; ++i)
-        shift_left_impl(BITS_PER_BYTE);
-      shift_left_impl(shift % BITS_PER_BYTE);
+      for (index_t i = 0; i < shift / BITS_IN_BYTE; ++i)
+        shift_left_impl(BITS_IN_BYTE);
+      shift_left_impl(shift % BITS_IN_BYTE);
     }
   }
 
+  // @brief Shifts bits right specified amount.
+  // @param shift The amount to shift.
+  // @note Only positive shifts are executed.
   void shift_right(index_t shift) {
     if (shift > 0) {
-      for (index_t i = 0; i < shift / BITS_PER_BYTE; ++i)
-        shift_right_impl(BITS_PER_BYTE);
-      shift_right_impl(shift % BITS_PER_BYTE);
+      for (index_t i = 0; i < shift / BITS_IN_BYTE; ++i)
+        shift_right_impl(BITS_IN_BYTE);
+      shift_right_impl(shift % BITS_IN_BYTE);
     }
   }
 
+  // @brief Nots all bits.
   void not_op() {
     for (index_t i = 0; i < BYTE_LENGTH; ++i)
       bit_array[i] = ~bit_array[i];
   }
 
+  // @brief Returns the amount of bytes used by the array.
+  auto byte_size() const {
+    return BYTE_LENGTH;
+  }
+
+  // @brief Returns the amount of bits in use.
+  // @note If bit_size() % 8 != 0, remaining bits can still 
+  // be directly accessable and modifiable, but doing so is 
+  // undefined under class specifications: please use least_signf_byte()
+  // to access the last byte and least_signf_byte_mask() with &-operator 
+  // to modify.
+  auto bit_size() const {
+    return Bits;
+  }
+
+  // @brief Returns the mask used for modifying the least significant byte.
+  bit_array_t least_signf_byte_mask() const {
+    return 0xFF >> (BITS_IN_BYTE - BYTE_LENGTH % BITS_IN_BYTE);
+  }
+
+  // @brief Returns the least significant byte using least_signf_byte_mask()
+  // with &-operator.
+  bit_array_t least_signf_byte() const {
+    return bit_array[BYTE_LENGTH - 1] & least_signf_byte_mask();
+  }
+
 private:
-  // Complete. Max shift == 8.
+  // @brief Left bit shift implementation. Behaviour defined for sl values
+  // 1 <= sl <= 8.
   void shift_left_impl(index_t sl) {
     for (index_t i = 0; i < BYTE_LENGTH - 1; ++i) {
       bit_array[i] <<= sl;
-      bit_array[i] |= bit_array[i + 1] >> (BITS_PER_BYTE - sl);
+      bit_array[i] |= bit_array[i + 1] >> (BITS_IN_BYTE - sl);
     }
     bit_array[BYTE_LENGTH - 1] <<= sl;
   }
 
-  // Complete. Max shift == 8.
+  // @brief Right bit shift implementation. Behaviour defined for sr values
+  // 1 <= sl <= 8.
   void shift_right_impl(index_t sr) {
     for (index_t i = BYTE_LENGTH - 1; i > 0; --i) {
       bit_array[i] >>= sr;
-      bit_array[i] |= bit_array[i - 1] << (BITS_PER_BYTE - sr);
+      bit_array[i] |= bit_array[i - 1] << (BITS_IN_BYTE - sr);
     }
     bit_array[0] >>= sr;
   }
 
 public:
-  static const uint16_t BITS_PER_BYTE = 8;
+  static const uint16_t BITS_IN_BYTE = 8;
 
+  // Storage array.
   bit_array_t bit_array[BYTE_LENGTH];
 };
 
