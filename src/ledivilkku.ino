@@ -87,7 +87,7 @@ public:
 
   // @brief Returns the mask used for modifying the least significant byte.
   bit_array_t least_signf_byte_mask() const {
-    return 0xFF >> (BITS_IN_BYTE - BYTE_LENGTH % BITS_IN_BYTE);
+    return 0xFF << (BITS_IN_BYTE - BYTE_LENGTH % BITS_IN_BYTE);
   }
 
   // @brief Returns the least significant byte using least_signf_byte_mask()
