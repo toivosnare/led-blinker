@@ -43,8 +43,14 @@ class BitArray {
   static_assert(Bits > 0, "Bit-size must be > 0.");
 
 public:
+  static const uint8_t BITS_IN_BYTE = 8;
+
+public:
   BitArray() {}
   ~BitArray() {}
+
+  // @brief Access array data. Bounds not checked.
+  bit_array_t operator[](index_t idx) { return bit_array[idx]; }
 
   // @brief Shifts bits left specified amount.
   // @param shift The amount to shift.
@@ -68,12 +74,6 @@ public:
     }
   }
 
-  // @brief Nots all bits.
-  void not_op() {
-    for (index_t i = 0; i < BYTE_LENGTH; ++i)
-      bit_array[i] = ~bit_array[i];
-  }
-
   // @brief Returns the amount of bytes used by the array.
   auto byte_size() const { return BYTE_LENGTH; }
 
@@ -87,7 +87,10 @@ public:
 
   // @brief Returns the mask used for modifying the least significant byte.
   bit_array_t least_signf_byte_mask() const {
-    return 0xFF << (BITS_IN_BYTE - BYTE_LENGTH % BITS_IN_BYTE);
+    auto rem = Bits % BITS_IN_BYTE;
+    if (rem == 0)
+      return 0xFF;
+    return 0xFF << (BITS_IN_BYTE - rem);
   }
 
   // @brief Returns the least significant byte using least_signf_byte_mask()
@@ -108,13 +111,22 @@ private:
   }
 
   // @brief Right bit shift implementation. Behaviour defined for sr values
-  // 1 <= sl <= 8.
+  // 1 <= sr <= 8.
   void shift_right_impl(index_t sr) {
     for (index_t i = BYTE_LENGTH - 1; i > 0; --i) {
       bit_array[i] >>= sr;
       bit_array[i] |= bit_array[i - 1] << (BITS_IN_BYTE - sr);
     }
     bit_array[0] >>= sr;
+    bit_array[BYTE_LENGTH - 1] &= least_signf_byte_mask();
+  }
+
+  // @brief Inverts every bit inside defined bounds.
+  void not_me() {
+    for (index_t i = 0; i < BYTE_LENGTH - 1; ++i)
+      bit_array[i] = ~bit_array[i];
+    bit_array[BYTE_LENGTH - 1] =
+        (~bit_array[BYTE_LENGTH - 1]) & least_signf_byte_mask();
   }
 
   void and_with(const this_type &other) {
@@ -136,13 +148,10 @@ private:
   }
 
   inline uint16_t shorter(const this_type &other) {
-    return (BYTE_LENGTH < other.BYTE_LENGTH ? BYTE_LENGTH
-                                              : other.BYTE_LENGTH);
+    return (BYTE_LENGTH < other.BYTE_LENGTH ? BYTE_LENGTH : other.BYTE_LENGTH);
   }
 
-public:
-  static const uint8_t BITS_IN_BYTE = 8;
-
+private:
   // Storage array.
   bit_array_t bit_array[BYTE_LENGTH];
 };
