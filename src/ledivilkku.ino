@@ -11,25 +11,15 @@ const int LED_BITS_TO_BYTES = (LED_COUNT - 1) / 8 + 1;
 const int X_IDX_OFFSET = 5;
 const int Y_IDX_OFFSET = 2;
 
-const bool shape1[LED_COUNT] = {
-  0, 0, 1, 0, 0, 0, 0, 0, 0
-};
+const bool shape1[LED_COUNT] = {0, 0, 1, 0, 0, 0, 0, 0, 0};
 
-const bool shape2[LED_COUNT] = {
-  0, 1, 0, 0, 0, 1, 0, 0, 0
-};
+const bool shape2[LED_COUNT] = {0, 1, 0, 0, 0, 1, 0, 0, 0};
 
-const bool shape3[LED_COUNT] = {
-  1, 0, 0, 0, 1, 0, 0, 0, 1
-};
+const bool shape3[LED_COUNT] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
-const bool shape4[LED_COUNT] = {
-  0, 0, 0, 1, 0, 0, 0, 1, 0
-};
+const bool shape4[LED_COUNT] = {0, 0, 0, 1, 0, 0, 0, 1, 0};
 
-const bool shape5[LED_COUNT] = {
-  0, 0, 0, 0, 0, 0, 1, 0, 0
-};
+const bool shape5[LED_COUNT] = {0, 0, 0, 0, 0, 0, 1, 0, 0};
 
 led_bit_t ledArray[LED_BITS_TO_BYTES];
 
@@ -42,52 +32,67 @@ led_bit_t ledArray[LED_BITS_TO_BYTES];
  * with shift operators.
  * @param {string} Bits Who wrote the book
  */
-template<uint16_t Bits, uint16_t BYTE_LENGTH = (Bits - 1) / 8 + 1>
+template <uint16_t Bits, uint16_t BYTE_LENGTH = (Bits - 1) / 8 + 1>
 class BitArray {
-    using bit_array_t = uint8_t;
-    using index_t = uint8_t;
-    static_assert(sizeof(bit_array_t) == 1, "bit_array_t must be sized 1 byte.");
-    static_assert(BYTE_LENGTH == (Bits - 1) / 8 + 1, "Do not modify the value of BYTE_LENGTH.");
-    static_assert(Bits > 0, "Bit-size must be > 0.");
+  using bit_array_t = uint8_t;
+  using index_t = uint8_t;
+  static_assert(sizeof(bit_array_t) == 1, "bit_array_t must be sized 1 byte.");
+  static_assert(BYTE_LENGTH == (Bits - 1) / 8 + 1,
+                "Do not modify the value of BYTE_LENGTH.");
+  static_assert(Bits > 0, "Bit-size must be > 0.");
 
-  public:
-    BitArray() {}
-    ~BitArray() {}
+public:
+  BitArray() {}
+  ~BitArray() {}
 
-    // Complete. Max shift == 8.
-    void shift_left(index_t sl) {
-      for (index_t i = 0; i < BYTE_LENGTH - 1; ++i) {
-        bit_array[i] <<= sl;
-        bit_array[i] |= bit_array[i + 1] >> (BITS_PER_BYTE - sl);
-      }
-      bit_array[BYTE_LENGTH - 1] <<= sl;
+  void shift_left(index_t shift) {
+    if (shift > 0) {
+      for (index_t i = 0; i < shift / BITS_PER_BYTE; ++i)
+        shift_left_impl(BITS_PER_BYTE);
+      shift_left_impl(shift % BITS_PER_BYTE);
     }
+  }
 
-    // Complete. Max shift == 8.
-    void shift_right(index_t sr) {
-      for (index_t i = BYTE_LENGTH - 1; i > 0; --i) {
-        bit_array[i] >>= sr;
-        bit_array[i] |= bit_array[i - 1] << (BITS_PER_BYTE - sr);
-      }
-      bit_array[0] >>= sr;
+  void shift_right(index_t shift) {
+    if (shift > 0) {
+      for (index_t i = 0; i < shift / BITS_PER_BYTE; ++i)
+        shift_right_impl(BITS_PER_BYTE);
+      shift_right_impl(shift % BITS_PER_BYTE);
     }
+  }
 
-    void not_op() {
-      for (index_t i = 0; i < BYTE_LENGTH; ++i)
-        bit_array[i] = ~bit_array[i];
+  void not_op() {
+    for (index_t i = 0; i < BYTE_LENGTH; ++i)
+      bit_array[i] = ~bit_array[i];
+  }
+
+private:
+  // Complete. Max shift == 8.
+  void shift_left_impl(index_t sl) {
+    for (index_t i = 0; i < BYTE_LENGTH - 1; ++i) {
+      bit_array[i] <<= sl;
+      bit_array[i] |= bit_array[i + 1] >> (BITS_PER_BYTE - sl);
     }
+    bit_array[BYTE_LENGTH - 1] <<= sl;
+  }
 
-  public:
-    static const uint16_t BITS_PER_BYTE = 8;
-    
-    bit_array_t bit_array[BYTE_LENGTH];
+  // Complete. Max shift == 8.
+  void shift_right_impl(index_t sr) {
+    for (index_t i = BYTE_LENGTH - 1; i > 0; --i) {
+      bit_array[i] >>= sr;
+      bit_array[i] |= bit_array[i - 1] << (BITS_PER_BYTE - sr);
+    }
+    bit_array[0] >>= sr;
+  }
+
+public:
+  static const uint16_t BITS_PER_BYTE = 8;
+
+  bit_array_t bit_array[BYTE_LENGTH];
 };
 
-
 // Turns all LEDs off.
-inline void clearLedArray_fast() {
-  PORTD = B00011100;
-}
+inline void clearLedArray_fast() { PORTD = B00011100; }
 
 // Works correctly when led row has 3 least significant bits
 // assigned as LED states.
@@ -140,13 +145,9 @@ void printLedArray(bool *array_leds, unsigned long rowDelayMicros) {
   }
 }
 
-
 void setup() {
   for (int i = 2; i < 8; ++i)
     pinMode(i, OUTPUT);
 }
 
-
-void loop() {
-  printLedArray_fast(0x3, 1000);
-}
+void loop() { printLedArray_fast(0x3, 1000); }
