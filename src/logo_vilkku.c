@@ -75,3 +75,88 @@
 "e0f"
 "s14s23s24s32s33s42s43s52s5cs62s68s69s6as6bs6cs72s73s75s76s78s79s7as7cs7ds82s83s84s85s86s88s89s8cs8ds92s93s98s99s9cs9dsa8sa9sadsbcsbdsccscdsdasdbsdcseaseb"
 "w000de00a"
+
+// Change animation.
+"x"
+
+// Logo spinning in the vertical axis.
+// 1:
+"e0f"
+"s06s07s14s15s23s33s42s52s62s72s75s76s78s79s7as7ds88s8ds98s9dsa8sadsbdsccsdcseasebsf8sf9"
+"w000de00a"
+// 2:
+"e0f"
+"s07s15s16s24s34s43s53s63s73s76s78s79s7cs88s8cs98s9csa8sacsbcscbsdbse9seasf8"
+"w000de00a"
+// 3:
+"e0f"
+"s07s16s25s35s44s54s64s74s77s78s7bs88s8bs98s9bsa8sabsbbscasdase9sf8"
+"w000de00a"
+// 4:
+"e0f"
+"s07s17s26s36s45s55s65s75s78s7as88s8as98s9asa8saasbasc9sd9se8sf8"
+"w000de00a"
+// 5:
+"e0f"
+"s07s17s27s37s46s56s66s76s77s79s87s89s97s99sa7sa9sb9sc8sd8se8sf8"
+"w000de00a"
+// 6:
+"e0f"
+"s07s08s17s18s27s28s37s38s47s48s57s58s67s68s77s78s87s88s97s98sa7sa8sb7sb8sc7sc8sd7sd8se7se8sf7sf8"
+"w000de00a"
+// 7:
+"e0f"
+"s07s17s27s37s46s56s66s76s77s79s87s89s97s99sa7sa9sb9sc8sd8se8sf8"
+"w000de00a"
+// 8:
+"e0f"
+"s08s18s29s39s4as5as6as75s77s7as85s87s95s97sa5sa7sb5sc6sd6se7sf7"
+"w000de00a"
+// 9:
+"e0f"
+"s08s19s2as3as4bs5bs6bs74s77s78s7bs84s87s94s97sa4sa7sb4sc5sd5se6sf7"
+"w000de00a"
+// 10:
+"e0f"
+"s08s19s1as2bs3bs4cs5cs6cs73s76s77s79s7cs83s87s93s97sa3sa7sb3sc4sd4se5se6sf7"
+"w000de00a"
+// 11:
+"e0f"
+"s08s09s1as1bs2cs3cs4ds5ds6ds72s75s76s77s79s7as7ds82s87s92s97sa2sa7sb2sc3sd3se4se5sf6sf7"
+"w000de00a"
+// 12:
+"e0f"
+"s08s19s1as2bs3bs4cs5cs6cs73s76s77s79s7cs83s87s93s97sa3sa7sb3sc4sd4se5se6sf7"
+"w000de00a"
+// 13:
+"e0f"
+"s08s19s2as3as4bs5bs6bs74s77s78s7bs84s87s94s97sa4sa7sb4sc5sd5se6sf7"
+"w000de00a"
+// 14:
+"e0f"
+"s08s18s29s39s4as5as6as75s77s7as85s87s95s97sa5sa7sb5sc6sd6se7sf7"
+"w000de00a"
+// 15:
+"e0f"
+"s07s17s27s37s46s56s66s76s77s79s87s89s97s99sa7sa9sb9sc8sd8se8sf8"
+"w000de00a"
+// 16:
+"e0f"
+"s07s08s17s18s27s28s37s38s47s48s57s58s67s68s77s78s87s88s97s98sa7sa8sb7sb8sc7sc8sd7sd8se7se8sf7sf8"
+"w000de00a"
+// 17:
+"e0f"
+"s07s17s27s37s46s56s66s76s77s79s87s89s97s99sa7sa9sb9sc8sd8se8sf8"
+"w000de00a"
+// 18:
+"e0f"
+"s07s17s26s36s45s55s65s75s78s7as88s8as98s9asa8saasbasc9sd9se8sf8"
+"w000de00a"
+// 19:
+"e0f"
+"s07s16s25s35s44s54s64s74s77s78s7bs88s8bs98s9bsa8sabsbbscasdase9sf8"
+"w000de00a"
+// 20:
+"e0f"
+"s07s15s16s24s34s43s53s63s73s76s78s79s7cs88s8cs98s9csa8sacsbcscbsdbse9seasf8"
+"w000de00a"
