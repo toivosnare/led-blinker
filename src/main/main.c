@@ -53,10 +53,11 @@ PD0
 
 #define ROWS 16
 #define ROW_WAIT_US 250
-#define USECS_PER_TIMER 65536 / F_CPU // 8192
+// With 16-bit timer and 1/64 prescaler on F_CPU.
+#define USECS_PER_TIMER_OF 524288
 #define DEBOUNCE_TIME_MS 20
 
-volatile uint16_t usecs, secs, mins;
+volatile uint16_t usecs, msecs, secs, mins;
 
 void setup();
 void tick_sleep();
@@ -70,7 +71,7 @@ void set_column(uint16_t);
 int main(void)
 {
 	setup();
-	/* Replace with your application code */
+	
 	while (1)
 	{
 		//check_button();
@@ -97,19 +98,52 @@ void setup() {
 	DDRB |= 0x1F;
 	// Set pins LOW.
 	clear_all();
+	// Set 1/64 prescaler for Timer 1 for 125kHz frequency at 8Mhz.
+	TCCR1B |= (1 << CS10) | (1 << CS11);
 	// Reset timing numbers.
 	usecs = 0;
+	msecs = 0;
 	secs = 0;
 	mins = 0;
+	// Enable Timer1 overflow interrupt.
+	TIMSK |= (1 << TOIE1);
 	// Enable interrupts.
 	sei();
 }
 
-// Timed interrupt which increment the clock and checks for 
+// Timed interrupt which increments the clock and checks for 
 // button press.
-ISR(TIMER0_OVF_vect) {
-	usecs += USECS_PER_TIMER;
-	
+ISR(TIMER1_OVF_vect) {
+	usecs += 288;
+	msecs += 524 + usecs / 1000;
+	usecs %= 1000;
+	secs += msecs / 1000;
+	msecs %= 1000;
+	mins += secs / 60;
+	secs %= 60;
+	// One day of minutes.
+	mins %= 1440;
+}
+
+// Alternative to calculated version.
+void conditional_timer_add() {
+	usecs += 288;
+	msecs += 524;
+	if (usecs >= 1000) {
+		++msecs;
+		usecs %= 1000;
+	}
+	if (msecs >= 1000) {
+		++secs;
+		msecs %= 1000;
+	}
+	if (secs >= 60) {
+		++mins;
+		secs = 0;
+	}
+	if (mins >= 1440) {
+		mins = 0;
+	}
 }
 
 void tick_sleep() {
