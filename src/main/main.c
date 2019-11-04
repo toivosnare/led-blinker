@@ -215,5 +215,25 @@ void set_row(uint8_t row) {
 
 
 void set_column(uint16_t col) {
-	
+	for (uint16_t i = 1; i < ROWS; ++i) {
+		if (col & (1 << (2 * i - 1))) {
+			PORTD |= (1 << (8 - i));
+		}
+	}
+	PA2
+	PD7
+	PA1
+	PD6
+	PA0
+	PD5
+	PB0
+	PD4
+	PB1
+	PD3
+	PB2
+	PD2
+	PB3
+	PD1
+	PB4
+	PD0
 }
