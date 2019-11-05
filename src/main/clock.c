@@ -1,4 +1,4 @@
-#include <math.h> // for pow, sin, cos
+#include <math.h> // for sin, cos
 
 #define SCREEN_SIZE 16
 #define DIGIT_ROWS 5
