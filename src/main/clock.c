@@ -104,36 +104,48 @@ void displayDigitalClockOnScreen(int time)
     }
     
     // Display seconds as a ring around the screen
-    if(seconds<16)
+    for(int s=1;s<=seconds;s++)
     {
-        for(int i=SCREEN_SIZE;i>SCREEN_SIZE-seconds;i--)
-            screen[0] += pow(2, i - 1);
+        if(s < 17)
+            screen[0] |= (1 << (16 - s));
+        else if(s < 32)
+            screen[s - 16] |= 1;
+        else if(s < 47)
+            screen[15] |= (1 << (s - 31));
+        else if(s < 61)
+            screen[61 - s] |= (1 << 15);
+
     }
-    else
-    {
-        screen[0] = 65535;
-        if(seconds<31)
-        {
-            for(int row=1;row<=seconds-16;row++)
-                screen[row] |= 1;
-        }
-        else
-        {
-            for(int row=1;row<SCREEN_SIZE-1;row++)
-                screen[row] |= 1;
-            if(seconds<47)
-            {
-                for(int i=0;i<=seconds-31;i++)
-                    screen[SCREEN_SIZE - 1] += pow(2, i);
-            }
-            else
-            {
-                screen[SCREEN_SIZE - 1] = 65535;
-                for(int row=14;row>60-seconds;row--)
-                    screen[row] |= 32768;
-            }   
-        }
-    }
+    // if(seconds<16)
+    // {
+    //     for(int i=SCREEN_SIZE;i>SCREEN_SIZE-seconds;i--)
+    //         screen[0] += pow(2, i - 1);
+    // }
+    // else
+    // {
+    //     screen[0] = 65535;
+    //     if(seconds<31)
+    //     {
+    //         for(int row=1;row<=seconds-16;row++)
+    //             screen[row] |= 1;
+    //     }
+    //     else
+    //     {
+    //         for(int row=1;row<SCREEN_SIZE-1;row++)
+    //             screen[row] |= 1;
+    //         if(seconds<47)
+    //         {
+    //             for(int i=0;i<=seconds-31;i++)
+    //                 screen[SCREEN_SIZE - 1] += pow(2, i);
+    //         }
+    //         else
+    //         {
+    //             screen[SCREEN_SIZE - 1] = 65535;
+    //             for(int row=14;row>60-seconds;row--)
+    //                 screen[row] |= 32768;
+    //         }   
+    //     }
+    // }
 }
 
 void displayAnalogClockOnScreen(int time)
