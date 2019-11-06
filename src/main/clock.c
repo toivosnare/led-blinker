@@ -72,28 +72,19 @@ void displayDigitalClockOnScreen()
     minutes = minutes % 60;
     
     // Display seconds as a ring around the screen
-    for(uint8_t row=0;row<SCREEN_SIZE;row++)
+    if(seconds > 0)
+        screen[0] = ~((1 << MAX(16 - seconds, 0)) - 1);
+    else
+        screen[0] = 0;
+    for(uint8_t row=1;row<SCREEN_SIZE-1;row++)
     {
-        if(row == 0)
-        {
-            if(seconds > 0)
-                screen[row] = ~((1 << MAX(16 - seconds, 0)) - 1);
-            else
-                screen[row] = 0;
-        }
-        else if(row == 15)
-        {
-            if(seconds < 46)
-                screen[row] = (1 << MAX(seconds - 30, 0)) - 1;
-            else
-                screen[row] = 65535;
-        }
-        else
-        {
-            screen[row] = (row < seconds - 15 ? 1 : 0);
-            screen[row] |= (row > 60 - seconds ? 1 << 15 : 0);
-        }
+        screen[row] = (row < seconds - 15 ? 1 : 0);
+        screen[row] |= (row > 60 - seconds ? 1 << 15 : 0);
     }
+    if(seconds < 46)
+        screen[SCREEN_SIZE - 1] = (1 << MAX(seconds - 30, 0)) - 1;
+    else
+        screen[SCREEN_SIZE - 1] = 65535;
 
     // Display hours and minutes
     for(uint8_t row=0;row<DIGIT_ROWS;row++)
