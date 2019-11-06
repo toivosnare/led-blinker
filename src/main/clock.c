@@ -71,20 +71,18 @@ void displayDigitalClockOnScreen()
     hours = minutes / 60;
     minutes = minutes % 60;
     
-    // Display seconds as a ring around the screen
-    if(seconds > 0)
-        screen[0] = ~((1 << MAX(16 - seconds, 0)) - 1);
-    else
-        screen[0] = 0;
+    screen[0] = ~((1 << MAX(8 - seconds, 0)) - 1) & 0xFF;
+    if(seconds > 52)
+        screen[0] |= ~((1 << (68 - seconds)) - 1);
     for(uint8_t row=1;row<SCREEN_SIZE-1;row++)
     {
-        screen[row] = (row < seconds - 15 ? 1 : 0);
-        screen[row] |= (row > 60 - seconds ? 1 << 15 : 0);
+        screen[row] = (row < seconds - 7 ? 1 : 0);
+        screen[row] |= (row > 52 - seconds ? 1 << 15 : 0);
     }
-    if(seconds < 46)
-        screen[SCREEN_SIZE - 1] = (1 << MAX(seconds - 30, 0)) - 1;
+    if(seconds < 38)
+        screen[SCREEN_SIZE - 1] = (1 << MAX(seconds - 22, 0)) - 1;
     else
-        screen[SCREEN_SIZE - 1] = 65535;
+        screen[SCREEN_SIZE - 1] = 0xFFFF;
 
     // Display hours and minutes
     for(uint8_t row=0;row<DIGIT_ROWS;row++)
@@ -126,13 +124,17 @@ void displayAnalogClockOnScreen()
     drawLine(x0, y0, x1, y1);
 }
 
-// Example usage:
 // #include <bitset>
 // #include <iostream>
 // uint8_t main(void)
 // {
-//     displayAnalogClockOnScreen();
-//     for(uint8_t i=0;i<SCREEN_SIZE;i++)
-//         std::cout << std::bitset<16>(screen[i]).to_string() << std::endl;
+//     for(uint8_t i=0;i<61;i++)
+//     {
+//         seconds = i;
+//         displayDigitalClockOnScreen();
+//         for(uint8_t i=0;i<SCREEN_SIZE;i++)
+//             std::cout << std::bitset<16>(screen[i]).to_string() << std::endl;
+//         std::cout << std::endl;
+//     }     
 //     return 0;
 // }
