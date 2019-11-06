@@ -7,23 +7,9 @@
 #define PI 3.14159265358979323846 // from math.h?
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
-const uint16_t digits[10] = {31599, 25746, 29671, 29391, 23497, 31183, 31215, 29257, 31727, 31695};
+const uint16_t digits[10] = {31599, 9362, 29671, 29391, 23497, 31183, 31215, 29257, 31727, 31695};
 uint16_t screen[SCREEN_SIZE];
 uint16_t minutes = 12*60 + 34, seconds = 56;
-
-// Find the first digit of n
-uint8_t firstDigit(uint8_t n) 
-{ 
-    while (n >= 10)  
-        n /= 10; 
-    return n; 
-}
-
-// Find the last digit of n
-uint8_t lastDigit(uint8_t n) 
-{ 
-    return (n % 10); 
-}
 
 // Bresenham's line algorithm
 void drawLine(float x1, float y1, float x2, float y2)
@@ -90,11 +76,17 @@ void displayDigitalClockOnScreen()
     {
         if(row == 0)
         {
-            screen[row] = ~((1 << MAX(16 - seconds, 0)) - 1);
+            if(seconds > 0)
+                screen[row] = ~((1 << MAX(16 - seconds, 0)) - 1);
+            else
+                screen[row] = 0;
         }
         else if(row == 15)
         {
-            screen[row] = (1 << MAX(seconds - 30, 0)) - 1;
+            if(seconds < 46)
+                screen[row] = (1 << MAX(seconds - 30, 0)) - 1;
+            else
+                screen[row] = 65535;
         }
         else
         {
@@ -103,13 +95,13 @@ void displayDigitalClockOnScreen()
         }
     }
 
-    //Display hours and minutes
+    // Display hours and minutes
     for(uint8_t row=0;row<DIGIT_ROWS;row++)
     {
-        screen[row+2] |= ((digits[firstDigit(hours)] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 9; // First digit of hours
-        screen[row+2] |= ((digits[lastDigit(hours)] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 4; // Second digit of hours
-        screen[row+9] |= ((digits[firstDigit(minutes)] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 9; // First digit of minutes
-        screen[row+9] |= ((digits[lastDigit(minutes)] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 4; // Second digit of minutes
+        screen[row+2] |= ((digits[hours / 10] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 9; // First digit of hours
+        screen[row+2] |= ((digits[hours % 10] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 4; // Second digit of hours
+        screen[row+9] |= ((digits[minutes / 10] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 9; // First digit of minutes
+        screen[row+9] |= ((digits[minutes % 10] >> ((DIGIT_ROWS - 1 - row) * DIGIT_COLUMNS)) & 7) << 4; // Second digit of minutes
     }
 }
 
